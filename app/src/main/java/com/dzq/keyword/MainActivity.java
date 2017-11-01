@@ -1,13 +1,10 @@
 package com.dzq.keyword;
 
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.dzq.keyword.widget.KeyWordLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +14,12 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Bind(R.id.lay_keywords)
-    LinearLayout layKeywords;
-
     int canUserScreenWidth;
     int rightMargin;
     int padding7dp2px;
     List<String> keyArray = new ArrayList<>();
+    @Bind(R.id.lay_keywords2)
+    KeyWordLayout layKeywords2;
 
 
     @Override
@@ -44,78 +40,20 @@ public class MainActivity extends AppCompatActivity {
         keyArray.add("8888");
         keyArray.add("9999");
         keyArray.add("0000");
-        SetKeywordsData();
-    }
 
-    private void SetKeywordsData() {
-        if (keyArray == null) return;
-        layKeywords.removeAllViews();
-        LinearLayout layKeywordsContent1 = null;
-        LinearLayout layKeywordsContent2 = null;
-        boolean flag = true;
-        int width = 0;
-
-        for (int i = 0; i < keyArray.size(); i++) {
-            TextView textView = new TextView(this);
-            textView.setPadding(padding7dp2px, padding7dp2px, padding7dp2px, padding7dp2px);
-            textView.setTag(i);
-            textView.setText(keyArray.get(i));
-            textView.setBackgroundResource(R.drawable.bg_keywords_selector);
-            textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(MainActivity.this, view.getTag().toString(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            int textNeedsLength = getTextWidth(textView) + padding7dp2px * 2;
-            width = width + textNeedsLength + rightMargin;
-            if (flag) {
-                if (canUserScreenWidth >= width) {
-                    layKeywordsContent1 = addLayChild(layKeywordsContent1, 0);
-                    layKeywordsContent1.addView(textView);
-                } else {
-                    layKeywordsContent2 = addLayChild(layKeywordsContent2, 15);
-                    width = textNeedsLength + rightMargin;
-                    layKeywordsContent2.addView(textView);
-                    flag = false;
-                }
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) textView
-                        .getLayoutParams();
-                layoutParams.rightMargin = rightMargin;
-            } else {
-
-                if (canUserScreenWidth >= width) {
-                    layKeywordsContent2 = addLayChild(layKeywordsContent2, 15);
-                    layKeywordsContent2.addView(textView);
-                    LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) textView
-                            .getLayoutParams();
-                    layoutParams.rightMargin = rightMargin;
-                } else return;
+        layKeywords2.setCanUserScreenWidth(canUserScreenWidth);
+        layKeywords2.setItemMarginHorizontal(rightMargin);
+        layKeywords2.setItemMarginVertical(CommonUtil.dip2px(this, 13));
+        layKeywords2.setItemPadding(padding7dp2px, padding7dp2px, padding7dp2px, padding7dp2px);
+        layKeywords2.setKeywordsData(keyArray);
+        layKeywords2.setKeyWordLayoutItemOnClickListener(new KeyWordLayout.KeyWordLayoutItemOnClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show();
             }
-
-        }
-
+        });
 
     }
 
-    private LinearLayout addLayChild(LinearLayout layChild, int topMarginDp) {
-        if (layChild == null) {
-            layChild = new LinearLayout(this);
-            layKeywords.addView(layChild);
-        }
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) layChild
-                .getLayoutParams();
-        layoutParams.topMargin = CommonUtil.dip2px(this, topMarginDp);
-        return layChild;
-    }
-
-    public int getTextWidth(TextView textView) {
-        Paint paint = textView.getPaint();
-        Rect bounds = new Rect();
-        String text = textView.getText().toString();
-        paint.getTextBounds(text, 0, text.length(), bounds);
-        int width = bounds.left + bounds.width();
-        return width;
-    }
 
 }
